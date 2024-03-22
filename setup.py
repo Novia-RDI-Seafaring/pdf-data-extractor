@@ -182,6 +182,7 @@ setup(
         'wrapt==1.16.0',
         'wsproto==1.2.0',
         'yarl==1.9.4',
-        'zipp==3.17.0'
+        'zipp==3.17.0',
+        'pdfplumber'
     ],
 )
