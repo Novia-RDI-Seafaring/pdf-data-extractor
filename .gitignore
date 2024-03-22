@@ -7,3 +7,5 @@ __pycache__
 credentials.py
 experiments/
 .DS_Store
+build
+pdf_data_extractor.egg-info/
