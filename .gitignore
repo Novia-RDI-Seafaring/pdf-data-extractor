@@ -1,0 +1,9 @@
+.venv/
+.env
+data/
+output/
+__pycache__
+.ipynb_checkpoints
+credentials.py
+experiments/
+.DS_Store
