@@ -17,19 +17,19 @@ class SearchablePDF():
                  chat_llm=OpenAI('gpt-4', max_tokens=4000), 
                  vision_llm=OpenAI('gpt-4-vision-preview', max_tokens=4000)):
         
+
         if isinstance(pdf, str):
             pdf = SinglePagePDF(pdf_path=pdf)
+
+        self.pdf = pdf
+        self.vision_llm = vision_llm
+        self.json_schema_string = json_schema_string
 
         if json_value_string is None:
             self.json_value_string = self._getText()
         else:
             self.json_value_string = json_value_string
         
-        self.pdf = pdf
-        self.json_schema_string = json_schema_string
-
-        self.vision_llm = vision_llm
-
         self.json_query_engine = JSONQueryEngine(
             json_value=json.loads(self.json_value_string),
             json_schema=json.loads(json_schema_string),
