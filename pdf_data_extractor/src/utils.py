@@ -36,7 +36,6 @@ def custom_output_processor(llm_output: str, json_value: dict) -> dict:
         return dictionary
     
     expressions = [expr.strip() for expr in llm_output.split(",")]
-    print(expressions)
     results = {}
 
     res = []
@@ -52,7 +51,6 @@ def custom_output_processor(llm_output: str, json_value: dict) -> dict:
             found = jsonpath_expr.find(json_value)
             for datum in found:
                 path = recursive_find_path(datum, [])[::-1]
-                print('PATH ', path)
                 res.append((path, datum.value))
         except Exception as exc:
             raise ValueError(f"Invalid JSON Path: {expression}") from exc

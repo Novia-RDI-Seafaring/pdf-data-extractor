@@ -6,6 +6,7 @@ from llama_index.llms import OpenAI
 from llama_index.indices.struct_store import JSONQueryEngine
 from llama_index.core.llms.types import ChatMessage
 import json
+import os
 from .utils import *
 
 class SearchablePDF():
@@ -15,7 +16,8 @@ class SearchablePDF():
                  json_schema_string: str,
                  json_value_string = None,
                  chat_llm=OpenAI('gpt-4', max_tokens=4000), 
-                 vision_llm=OpenAI('gpt-4-vision-preview', max_tokens=4000)):
+                 vision_llm=OpenAI('gpt-4-vision-preview', max_tokens=4000),
+                 verbose=False):
         
 
         if isinstance(pdf, str):
@@ -24,6 +26,7 @@ class SearchablePDF():
         self.pdf = pdf
         self.vision_llm = vision_llm
         self.json_schema_string = json_schema_string
+        self.verbose = verbose
 
         if json_value_string is None:
             self.json_value_string = self._getText()
@@ -35,16 +38,18 @@ class SearchablePDF():
             json_schema=json.loads(json_schema_string),
             service_context=ServiceContext.from_defaults(llm=chat_llm),
             output_processor=custom_output_processor,
-            verbose=True
+            verbose=self.verbose
         )
 
         # chat history
         self.messages = []
     
     def add_message(self, user_query, bot_response):
-        print("Adding user query to messages:", user_query)  # Debug print
+        if self.verbose:
+            print("Adding user query to messages:", user_query)  # Debug print
         self.messages.append({"message": user_query, "is_user": True})  # User message
-        print("Adding bot response to messages:", bot_response)  # Debug print
+        if self.verbose:
+            print("Adding bot response to messages:", bot_response)  # Debug print
         self.messages.append({"message": bot_response, "is_user": False})  # Bot response
 
     def _getText(self):
@@ -79,9 +84,12 @@ class SearchablePDF():
         try:
             response = self.json_query_engine.query(query)
             relevant_json = custom_output_processor(response.metadata['json_path_response_str'], self.json_query_engine._json_value)
-            print('Relevant json: -----', relevant_json)
+            
             self.add_message(query, response.response)
-            print("Current conversation history:", self.messages)
+
+            if self.verbose:
+                print('Relevant json: -----', relevant_json)
+                print("Current conversation history:", self.messages)
 
         # TODO handle exceptions
         except ValueError as e:
@@ -113,18 +121,18 @@ class SearchablePDF():
                 }
         
         pdf_bboxes, degrees = extraction_wrapper(relevant_json)
-        print('bboxes: ', pdf_bboxes)
+        
         (pdf_height, pdf_width) = self.pdf.dimensions
         
         # TODO remove hard coded
         im_width = 1684 
         im_height = 1191
 
-        print('pdf_dims: ', pdf_height, pdf_width)
-
         img_bboxes = [pdf_coords_to_img_coords(pdf_bbox, pdf_height, pdf_width, im_width, im_height) for pdf_bbox in pdf_bboxes]
         
-        print('Im bboxes: ', img_bboxes)
+        if self.verbose:
+            print('pdf bboxes: ', pdf_bboxes)
+            print('image bboxes: ', img_bboxes)
 
         x = str(img_bboxes[0][2] - img_bboxes[0][0])
         y = str(img_bboxes[0][3] - img_bboxes[0][1])
@@ -140,10 +148,11 @@ class SearchablePDF():
 
 
 if __name__ == '__main__':
-    pdf_path = '..data/he-specification.pdf'
-    json_schema_path = '..data/he-specification_schema.json'
-    with open(json_schema_path) as json_schema_file:
-        json_schema_contents = json_schema_file.read()            
-        json_schema_string = json.dumps(json.loads(json_schema_contents))
+    base_path = os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir))
+
+    pdf_path = os.path.join(base_path, 'demo_data/he-specification.pdf')
+    json_schema_path = os.path.join(base_path, 'demo-data/he-specification_schema.json')
+    json_schema_string = readJsonFile(json_schema_path)
 
     searchablePDF = SearchablePDF(pdf=pdf_path, json_schema_string=json_schema_string)
+    response = searchablePDF.query('What is the max temp of side 1?')
