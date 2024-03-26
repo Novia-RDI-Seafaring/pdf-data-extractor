@@ -104,8 +104,8 @@ def extract_json_from_markdown(json_markdown):
 
     pattern = r'```json(.*?)```'
     json_string = re.search(pattern, json_markdown, re.DOTALL)
-
-    return json_string
+    
+    return json_string.group(1).strip()
 
 def draw_rects(page, bboxes, color=(1, 0, 0)):
     """adds rect to page in place
@@ -223,9 +223,9 @@ def pil_to_base64(pil_image):
 
     # Convert bytes to base64 string
     base64_image = base64.b64encode(image_bytes).decode('utf-8')
-
+    return base64_image
     # Return base64 string in the specified format
-    return f"data:image/png;base64,{base64_image}"
+    #return f"data:image/png;base64,{base64_image}"
 
 def convert_to_degrees(cosine, sine):
  
