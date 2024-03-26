@@ -9,3 +9,5 @@ experiments/
 .DS_Store
 build
 pdf_data_extractor.egg-info/
+test.py
+.vscode
