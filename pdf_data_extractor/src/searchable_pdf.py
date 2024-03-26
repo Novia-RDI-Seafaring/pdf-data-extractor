@@ -9,14 +9,17 @@ import json
 import os
 from .utils import *
 
+api_key = os.getenv('OPENAI_API_KEY')
+
 class SearchablePDF():
 
     def __init__(self, 
                  pdf: SinglePagePDF | str,
                  json_schema_string: str,
                  json_value_string = None,
-                 chat_llm=OpenAI('gpt-4', max_tokens=4000), 
-                 vision_llm=OpenAI('gpt-4-vision-preview', max_tokens=4000),
+                 api_key=None,
+                 chat_llm=OpenAI('gpt-4', max_tokens=4000, api_key=api_key),
+                 vision_llm=OpenAI('gpt-4-vision-preview', max_tokens=4000, api_key=api_key),
                  verbose=False):
         
 
