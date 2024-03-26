@@ -1,0 +1,1025 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "2dArr": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+            }
+        },
+    "description": "Data sheet for a heat exchanger of a ship",
+    "type": "object",
+    "properties": {
+        "title": {
+            "description": "Title of the data sheet",
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string"
+                },
+                "bbox": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "dir": { "$ref": "#/definitions/2dArr" } 
+            },
+            "required": [
+                "text",
+                "bbox",
+                "dir"
+            ]
+        },
+        "nonTechnicalInformation": {
+            "description": "Contains non technical specification",
+            "type": "object",
+            "properties": {
+                "riskFactor": {
+                    "description": "Risk factor of the specified product",
+                    "type": "object",
+                    "properties": {
+                        "value": {
+                            "type": "integer"
+                        },
+                        "text": {
+                            "type": "string"
+                        },
+                        "unit": {
+                            "type": "string"
+                        },
+                        "bbox": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        },
+                        "dir": { "$ref": "#/definitions/2dArr" } 
+                    },
+                    "required": [
+                        "value",
+                        "text",
+                        "bbox",
+                        "dir"
+                    ]
+                },
+                "customerName": {
+                    "description": "Customer to whom specification is dedicated to",
+                    "type": "object",
+                    "properties": {
+                        "text": {
+                            "type": "string"
+                        },
+                        "bbox": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        },
+                        "dir": { "$ref": "#/definitions/2dArr" } 
+                    },
+                    "required": [
+                        "text",
+                        "bbox",
+                        "dir"
+                    ]
+                },
+                "supplier": {
+                    "description": "Company that produces/supplies the specified product",
+                    "type": "object",
+                    "properties": {
+                        "text": {
+                            "type": "string"
+                        },
+                        "bbox": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        },
+                        "dir": { "$ref": "#/definitions/2dArr" } 
+                    },
+                    "required": [
+                        "text",
+                        "bbox",
+                        "dir"
+                    ]
+                },
+                "itemNumber": {
+                    "description": "Number of the specified product",
+                    "type": "object",
+                    "properties": {
+                        "value": {
+                            "type": "integer"
+                        },
+                        "text": {
+                            "type": "string"
+                        },
+                        "bbox": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        },
+                        "dir": { "$ref": "#/definitions/2dArr" } 
+                    },
+                    "required": [
+                        "value",
+                        "text",
+                        "bbox",
+                        "dir"
+                    ]
+                },
+                "model": {
+                    "description": "Model that is being specified",
+                    "type": "object",
+                    "properties": {
+                        "text": {
+                            "type": "string"
+                        },
+                        "bbox": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        },
+                        "dir": { "$ref": "#/definitions/2dArr" } 
+                    },
+                    "required": [
+                        "text",
+                        "bbox",
+                        "dir"
+                    ]
+                },
+                "date": {
+                    "description": "Date when the specification was formulated",
+                    "type": "object",
+                    "properties": {
+                        "text": {
+                            "type": "string"
+                        },
+                        "bbox": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        },
+                        "dir": { "$ref": "#/definitions/2dArr" } 
+                    },
+                    "required": [
+                        "text",
+                        "bbox",
+                        "dir"
+                    ]
+                },
+                "place": {
+                    "description": "Place where the specification was formulated",
+                    "type": "object",
+                    "properties": {
+                        "text": {
+                            "type": "string"
+                        },
+                        "bbox": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        },
+                        "dir": { "$ref": "#/definitions/2dArr" } 
+                    },
+                    "required": [
+                        "text",
+                        "bbox",
+                        "dir"
+                    ]
+                },
+                "ref": {
+                    "description": "Reference to the specified product",
+                    "type": "object",
+                    "properties": {
+                        "text": {
+                            "type": "string"
+                        },
+                        "bbox": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        },
+                        "dir": { "$ref": "#/definitions/2dArr" } 
+                    },
+                    "required": [
+                        "text",
+                        "bbox",
+                        "dir"
+                    ]
+                }
+            },
+            "required": [
+                "riskFactor",
+                "customerName",
+                "supplier",
+                "itemNumber",
+                "model",
+                "place",
+                "ref"
+            ]
+        },
+        "technicalSpecifications": {
+            "description": "Technical specification for the two sides of the heat exchanger",
+            "type": "object",
+            "properties": {
+                "side1": {
+                    "description": "Contains all technical specifications for side 1",
+                    "type": "object",
+                    "properties": {
+                        "testPressure": {
+                            "description": "Test pressure of the specified part/producte",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "designPressure": {
+                            "description": "Design pressure of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "maxTemperature": {
+                            "description": "Maximal temperature of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "minTemperature": {
+                            "description": "Minimal temperature of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "netWeight": {
+                            "description": "Net weight of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "weightWithWater": {
+                            "description": "Weight of the specified part/product if filled with water",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "heatingSurface": {
+                            "description": "Heating surface of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "coolingCapacity": {
+                            "description": "Cooling capactiy of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "heatTransferCoefficient": {
+                            "description": "Heat transfer coefficient of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "media": {
+                            "description": "Media of the specified part/product",
+                            "type": "string",
+                            "properties": {
+                                "text": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "specificHeatCapacity": {
+                            "description": "Specific heat capacity of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "inletTemperature": {
+                            "description": "Inlet temperature of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "outletTemperature": {
+                            "description": "Outlet temperature of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "flowRate": {
+                            "description": "Flow rate of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "liquidVolume": {
+                            "description": "Liquid volume of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "testPressure",
+                        "designPressure",
+                        "maxTemperature",
+                        "minTemperature",
+                        "netWeight",
+                        "weightWithWater",
+                        "heatingSurface",
+                        "coolingCapacity",
+                        "heatTransferCoefficient",
+                        "media",
+                        "specificHeatCapacity",
+                        "inletTemperature",
+                        "outletTemperature",
+                        "flowRate",
+                        "liquidVolume"
+                    ]
+                },
+                "side2": {
+                    "description": "Contains all technical specifications for side 2",
+                    "type": "object",
+                    "properties": {
+                        "testPressure": {
+                            "description": "Test pressure of the specified part/producte",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "designPressure": {
+                            "description": "Design pressure of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "maxTemperature": {
+                            "description": "Maximal temperature of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "minTemperature": {
+                            "description": "Minimal temperature of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "media": {
+                            "description": "Media of the specified part/product",
+                            "type": "string",
+                            "properties": {
+                                "text": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "specificHeatCapacity": {
+                            "description": "Specific heat capacity of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "inletTemperature": {
+                            "description": "Inlet temperature of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "outletTemperature": {
+                            "description": "Outlet temperature of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "flowRate": {
+                            "description": "Flow rate of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        },
+                        "liquidVolume": {
+                            "description": "Liquid volume of the specified part/product",
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "integer"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "unit": {
+                                    "type": "string"
+                                },
+                                "bbox": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                },
+                                "dir": { "$ref": "#/definitions/2dArr" } 
+                            },
+                            "required": [
+                                "value",
+                                "text",
+                                "unit",
+                                "bbox",
+                                "dir"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "testPressure",
+                        "designPressure",
+                        "maxTemperature",
+                        "minTemperature",
+                        "media",
+                        "specificHeatCapacity",
+                        "inletTemperature",
+                        "outletTemperature",
+                        "flowRate",
+                        "liquidVolume"
+                    ]
+                }
+            },
+            "required": [
+                "side1",
+                "side2"
+            ]
+        },
+        "auxData": {
+            "description": "Contains information that is in the document but does not fit to any of the other specified fields in the schema",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string"
+                    },
+                    "bbox": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    },
+                    "dir": { "$ref": "#/definitions/2dArr" } 
+                },
+                "required": [
+                    "text",
+                    "bbox",
+                    "dir"
+                ]
+            }
+        }
+    },
+    "required": [
+        "title",
+        "nonTechnicalInformation",
+        "technicalSpecifications"
+    ]
+}
