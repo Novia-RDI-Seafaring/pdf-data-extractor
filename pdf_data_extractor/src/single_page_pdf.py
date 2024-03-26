@@ -10,6 +10,7 @@ class SinglePagePDF:
         self.page = doc[rel_page]
         self.page_dict = self._get_page_dict()
         self.path = pdf_path
+        self.image = self.toImage()
 
     def _crop_whitespace(image):
 

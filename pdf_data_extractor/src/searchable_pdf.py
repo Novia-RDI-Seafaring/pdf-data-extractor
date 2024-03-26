@@ -67,7 +67,7 @@ class SearchablePDF():
 
         response = self.multimodal_llm.complete(
             prompt=EXTRACT_JSON_VALUE_FROM_SCHEMA.format(json_schema_string=self.json_schema_string, page_json_string=stripped_page_string),
-            image_documents=[ImageDocument(image=f"{pil_to_base64(self.pdf.toImage())}")]
+            image_documents=[ImageDocument(image=f"{pil_to_base64(self.pdf.image)}")]
         )
 
         try:  
@@ -125,10 +125,7 @@ class SearchablePDF():
         pdf_bboxes, degrees = extraction_wrapper(relevant_json)
         
         (pdf_height, pdf_width) = self.pdf.dimensions
-        
-        # TODO remove hard coded
-        im_width = 1684 
-        im_height = 1191
+        (im_width, im_height) = self.pdf.image.size
 
         img_bboxes = [pdf_coords_to_img_coords(pdf_bbox, pdf_height, pdf_width, im_width, im_height) for pdf_bbox in pdf_bboxes]
         
