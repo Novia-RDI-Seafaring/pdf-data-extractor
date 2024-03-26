@@ -3,8 +3,10 @@ from .prompts import EXTRACT_JSON_VALUE_FROM_SCHEMA
 
 from llama_index import ServiceContext
 from llama_index.llms import OpenAI
+from llama_index.multi_modal_llms.openai import OpenAIMultiModal
 from llama_index.indices.struct_store import JSONQueryEngine
 from llama_index.core.llms.types import ChatMessage
+from llama_index.schema import ImageDocument
 import json
 import os
 from .utils import *
@@ -17,9 +19,9 @@ class SearchablePDF():
                  pdf: SinglePagePDF | str,
                  json_schema_string: str,
                  json_value_string = None,
-                 api_key=None,
                  chat_llm=OpenAI('gpt-4', max_tokens=4000, api_key=api_key),
-                 vision_llm=OpenAI('gpt-4-vision-preview', max_tokens=4000, api_key=api_key),
+                 multimodal_llm=OpenAIMultiModal('gpt-4-vision-preview', max_new_tokens=4000, timeout=500,
+                                                 image_detail='auto', api_key=api_key),
                  verbose=False):
         
 
@@ -27,7 +29,8 @@ class SearchablePDF():
             pdf = SinglePagePDF(pdf_path=pdf)
 
         self.pdf = pdf
-        self.vision_llm = vision_llm
+        self.multimodal_llm = multimodal_llm
+        self.chat_llm = chat_llm
         self.json_schema_string = json_schema_string
         self.verbose = verbose
 
@@ -39,7 +42,7 @@ class SearchablePDF():
         self.json_query_engine = JSONQueryEngine(
             json_value=json.loads(self.json_value_string),
             json_schema=json.loads(json_schema_string),
-            service_context=ServiceContext.from_defaults(llm=chat_llm),
+            service_context=ServiceContext.from_defaults(llm=self.chat_llm),
             output_processor=custom_output_processor,
             verbose=self.verbose
         )
@@ -56,29 +59,25 @@ class SearchablePDF():
         self.messages.append({"message": bot_response, "is_user": False})  # Bot response
 
     def _getText(self):
-        page_dict = strip_dict(self.pdf.page_dict, ['width', 'height', 'text','bbox', 'dir'])
+        if self.verbose:
+            print('generating json value')
+        stripped_page_dict = strip_dict(self.pdf.page_dict, ['width', 'height', 'text','bbox', 'dir'])
 
-        page_json_string = json.dumps(page_dict)
-        
-        response = self.vision_llm.chat(
-            messages=[
-                ChatMessage(role='user', content=[
-                {
-                "type": "text",
-                "text": EXTRACT_JSON_VALUE_FROM_SCHEMA.format(json_schema_string=self.json_schema_string, page_json_string=page_json_string)
-                },
-                {
-                "type": "image_url",
-                "image_url": {
-                    "url": pil_to_base64(self.pdf.toImage())
-                }
-                }
-            ])
-            ]
+        stripped_page_string = json.dumps(stripped_page_dict)
+
+        response = self.multimodal_llm.complete(
+            prompt=EXTRACT_JSON_VALUE_FROM_SCHEMA.format(json_schema_string=self.json_schema_string, page_json_string=stripped_page_string),
+            image_documents=[ImageDocument(image=f"{pil_to_base64(self.pdf.toImage())}")]
         )
 
-        json_string = extract_json_from_markdown(response)
-        
+        try:  
+            json_markdown = response.text.replace('\\n','\n')
+            json_string = extract_json_from_markdown(json_markdown)
+        except Exception as e:
+            raise Exception('generated json value does not conform with expected format, Excpetion: ', e)
+
+        if self.verbose:
+            print('Finished generating json value')
         return json_string
 
     def query(self, query):
@@ -101,21 +100,21 @@ class SearchablePDF():
                 print('------------ Exception that was thrown: ', e)
                 prompt = f"""The user asked: '{query}', which was not found by the JsonQueryEngine. Use the following error to provide
                 a helpful response: {e}."""
-                #print('prompt to provide good error message: ', prompt)
+                response = self.chat_llm.complete(prompt)
 
-                #response = query_gpt4(prompt)
-                # response = "This information is not in the JSON Schema. Please ask for details within the specification."
-                
-                #nl_query_engine.add_message(query, response),
-                
+                self.add_message(query, response.text)
+
+                status = 'success'
             else:
                 pass
                 # Handle other types of ValueError or re-raise if it's an unexpected error
-                #response = "An error occurred: " + str(e)
-                #nl_query_engine.add_message(query, response)
+                response = "An error occurred: " + str(e)
+                # self.add_message(query, response)
+                
+                status = 'failed'
 
             return {
-                    'status': 'failed',
+                    'status': status,
                     'message_history': self.messages,
                     'focus_point': None, # in img coordinates
                     'bboxes': None, # in img coordinates
@@ -148,14 +147,3 @@ class SearchablePDF():
             'degrees': degrees,
             'relevant_json': relevant_json
         }
-
-
-if __name__ == '__main__':
-    base_path = os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir))
-
-    pdf_path = os.path.join(base_path, 'demo_data/he-specification.pdf')
-    json_schema_path = os.path.join(base_path, 'demo-data/he-specification_schema.json')
-    json_schema_string = readJsonFile(json_schema_path)
-
-    searchablePDF = SearchablePDF(pdf=pdf_path, json_schema_string=json_schema_string)
-    response = searchablePDF.query('What is the max temp of side 1?')
