@@ -142,5 +142,5 @@ class SearchablePDF():
             'focus_point': (x, y), # in img coordinates
             'bboxes': img_bboxes, # in img coordinates
             'degrees': degrees,
-            'relevant_json': relevant_json
+            'relevant_json': remove_keys_recursive(relevant_json, ['dir', 'bbox'])
         }
