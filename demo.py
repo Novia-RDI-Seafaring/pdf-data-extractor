@@ -79,8 +79,8 @@ def upload_file(pdf_path, progress=gr.Progress()):
     except():
         print("done")
 
-def get_entire_json(nl_query_engine):
-    relevant_json = remove_keys_recursive(nl_query_engine._json_value, ['dir', 'bbox'])
+def get_entire_json(searchablePDF):
+    relevant_json = remove_keys_recursive(searchablePDF.json_query_engine._json_value, ['dir', 'bbox'])
 
     return f"```json{json.dumps(relevant_json, indent=4)}```" # gr.Markdown(nl_query_engine._json_value)
 
@@ -223,7 +223,7 @@ with gr.Blocks(css=css, head=head) as demo:
             json_schema = gr.State()
             searchablePDF = gr.State()
             reset_button = gr.Button('show entire json', visible=False)
-            #reset_button.click(get_entire_json, nl_query_engine, json_string_relevant)
+            reset_button.click(get_entire_json, searchablePDF, json_string_relevant)
             file_output = gr.File(visible=False, label="Upload the schema PDF")
             upload_button = gr.UploadButton("Click to Upload a File", file_types=["file"], file_count="single")
             upload_button.upload(upload_file, upload_button, [file_output, json_string_relevant, json_schema, searchablePDF, reset_button, original_image_row])
