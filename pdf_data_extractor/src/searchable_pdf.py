@@ -117,7 +117,7 @@ class SearchablePDF():
                     'status': status,
                     'message_history': self.messages,
                     'focus_point': None, # in img coordinates
-                    'bboxes': None, # in img coordinates
+                    'bboxes': [], # in img coordinates
                     'degrees': 0,
                     'relevant_json': {}
                 }
