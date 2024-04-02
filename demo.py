@@ -1,55 +1,32 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import os
-import sys
-import PyPDF2
-import fitz  # PyMuPDF
-import numpy as np
-from PIL import Image
-import base64
-import io
-import base64
-import requests
-import re
+import gradio as gr
 import json
-from jsonpath_ng import jsonpath, parse
-from utils import *
+import numpy as np
+import os
 
 from pdf_data_extractor import SearchablePDF
+from pdf_data_extractor.src.utils import *
 
 config = {
     'json_value_path': 'demo_data/he-specification.json',
     'json_schema_path': 'demo_data/he-specification_schema.json',
 }
 
-
-
-
-# IMPLEMENTATION OF THE GRADIO INTERFACE
-import gradio as gr
-import time
-import os
-import shutil
-from llama_index.indices.service_context import ServiceContext
-from llama_index.llms import OpenAI
-from llama_index.indices.struct_store import JSONQueryEngine
-from jsonpath_ng.jsonpath import DatumInContext
-
-
 #TODO move to extended query engine
 def query_msg(query, searchablePDF: SearchablePDF, img_bboxes, imm):
     aug_query = f"""{query} respond nicely."""
     # Additionally, add a key 'jsonRef' that identifies the json object containing the respective information in the llama index.
     response = searchablePDF.query(aug_query)
-    
+
     # Format and return the conversation history as before
     formatted_messages = []
     for i in range(0, len(searchablePDF.messages), 2):
         user_msg = searchablePDF.messages[i]["message"] if i < len(searchablePDF.messages) else None
         bot_msg = searchablePDF.messages[i+1]["message"] if i+1 < len(searchablePDF.messages) else None
         formatted_messages.append([user_msg, bot_msg])
-    
+
     _, _, focus_point, bboxes, degrees, relevant_json = response.values()
     showBboxes = len(bboxes) > 0
     return createHiddenValues(bboxes, degrees), "", formatted_messages, f"```json{json.dumps(relevant_json, indent=4)}```", bboxes, show_bboxes(imm, bboxes, rotate=degrees), gr.update(visible=True), gr.update(visible=not showBboxes), gr.update(visible=showBboxes)
@@ -59,18 +36,18 @@ def upload_file(pdf_path, progress=gr.Progress()):
     try:
         progress(0, desc="Extracting data from pdf ...")
         with open(config['json_value_path']) as json_file:
-            json_contents = json_file.read()            
+            json_contents = json_file.read()
         json_value_string = json.dumps(json.loads(json_contents))
 
         with open(config['json_schema_path']) as json_schema_file:
-            json_schema_contents = json_schema_file.read()            
+            json_schema_contents = json_schema_file.read()
         json_schema_string = json.dumps(json.loads(json_schema_contents))
 
-        
+
         searchablePDF = SearchablePDF(pdf=pdf_path, json_schema_string=json_schema_string, json_value_string=json_value_string)
 
         progress(0.5, desc="Making Document Searchable ...")
-        
+
         progress(1, desc="We are ready to interact with document!")
         rel_json =  remove_keys_recursive(searchablePDF.json_query_engine._json_value, ['dir', 'bbox'])
 
@@ -83,7 +60,6 @@ def get_entire_json(searchablePDF):
     relevant_json = remove_keys_recursive(searchablePDF.json_query_engine._json_value, ['dir', 'bbox'])
 
     return f"```json{json.dumps(relevant_json, indent=4)}```" # gr.Markdown(nl_query_engine._json_value)
-
 
 css = """
 .markdown pre {
@@ -143,7 +119,6 @@ updateImg = () => {
    const {rotation, x, y, scale} = window.imgTransform;
    applyTransformations(rotation, x, y, scale);
 }
-
 
 </script>
 """
@@ -205,7 +180,7 @@ with gr.Blocks(css=css, head=head) as demo:
         print('IM annotations: ', annotations)
 
         return gr.update(value=(imm, annotations))
-    
+
     json_string_relevant = gr.State([])
     img_bboxes = gr.State([])
 
@@ -235,9 +210,5 @@ with gr.Blocks(css=css, head=head) as demo:
                     chat_input = gr.Textbox(label="Enter your query")
                     chat_input.submit(query_msg, inputs=[chat_input, searchablePDF, img_bboxes,imm], outputs=[values, chat_input, chat_output, json_string_relevant, img_bboxes, anIm, reset_button, original_image_row, annotated_image_row])
 
-
 if __name__ == '__main__':
-    
     demo.launch()
-
-
