@@ -1,20 +1,20 @@
-from .single_page_pdf import SinglePagePDF
-from .prompts import EXTRACT_JSON_VALUE_FROM_SCHEMA
-
-from llama_index import ServiceContext
-from llama_index.llms import OpenAI
-from llama_index.multi_modal_llms.openai import OpenAIMultiModal
-from llama_index.indices.struct_store import JSONQueryEngine
-from llama_index.core.llms.types import ChatMessage
-from llama_index.schema import ImageDocument
 import json
 import os
+
+from llama_index import ServiceContext
+from llama_index.core.llms.types import ChatMessage
+from llama_index.indices.struct_store import JSONQueryEngine
+from llama_index.llms import OpenAI
+from llama_index.multi_modal_llms.openai import OpenAIMultiModal
+from llama_index.schema import ImageDocument
+
+from .single_page_pdf import SinglePagePDF
+from .prompts import EXTRACT_JSON_VALUE_FROM_SCHEMA
 from .utils import *
 
 api_key = os.getenv('OPENAI_API_KEY')
 
 class SearchablePDF():
-
     def __init__(self, 
                  pdf: SinglePagePDF | str,
                  json_schema_string: str,
@@ -23,7 +23,6 @@ class SearchablePDF():
                  multimodal_llm=OpenAIMultiModal('gpt-4-vision-preview', max_new_tokens=4000, timeout=500,
                                                  image_detail='auto', api_key=api_key),
                  verbose=False):
-        
 
         if isinstance(pdf, str):
             pdf = SinglePagePDF(pdf_path=pdf)
