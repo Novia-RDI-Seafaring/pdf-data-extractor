@@ -1,22 +1,17 @@
-import pdfplumber
-import numpy as np
-import fitz
-from PIL import Image
-import matplotlib.pyplot as plt
-import PyPDF2
-import io
 import base64
+import fitz
 import math
+import numpy as np
+import io
 import json
 import re
+
 from jsonpath_ng.jsonpath import DatumInContext
 from jsonpath_ng import parse
+from PIL import Image
 
 def custom_output_processor(llm_output: str, json_value: dict) -> dict:
-
-    
     def recursive_find_path(datum: DatumInContext, context_paths):
-
         context_path = str(datum.path)
         if context_path == '$':
             return context_paths
@@ -40,7 +35,6 @@ def custom_output_processor(llm_output: str, json_value: dict) -> dict:
 
     res = []
     for expression in expressions:
-
         exp_split = expression.split('.')
         if exp_split[-1] in ['value', 'text', 'bbox', 'dir', 'unit']:
             exp_split[-1]='*'
@@ -79,6 +73,7 @@ def extraction_wrapper(dictionary):
     '''Returns:
     - list[[x0,y0,x1,z1]] bboxes
     - degree (int) between 0-360'''
+    
     bboxes, dirs = extract_bboxes_and_dirs(dictionary)
     
     im_dir = 0 if len(dirs)==0 else dirs[0]
@@ -108,8 +103,8 @@ def extract_json_from_markdown(json_markdown):
     return json_string.group(1).strip()
 
 def draw_rects(page, bboxes, color=(1, 0, 0)):
-    """adds rect to page in place
-    """
+    '''adds rect to page in place
+    '''
 
     shape = page.new_shape()
 
@@ -128,7 +123,6 @@ def draw_rects(page, bboxes, color=(1, 0, 0)):
     shape.commit()
 
 def get_page_dict(page):
-
     # https://pymupdf.readthedocs.io/en/latest/textpage.html#textpagedict
     textpage = page.get_textpage()
     page_dict = textpage.extractDICT()
@@ -142,7 +136,6 @@ def get_text_orientation(page, rect_a):
 
     (0,1) = vertical
     (1,0) = horizontal
-
     '''
 
     textpage = page.get_textpage()
@@ -185,7 +178,6 @@ def strip_dict(input_dict, keysToKeep):
 
     stripped_dict = input_dict.copy()
     for key, value in input_dict.items():
-       
         if isinstance(value, dict):
             print('is dict')
             stripped_dict[key] = strip_dict(value, keysToKeep)
@@ -228,7 +220,6 @@ def pil_to_base64(pil_image):
     #return f"data:image/png;base64,{base64_image}"
 
 def convert_to_degrees(cosine, sine):
- 
     # Calculate the angle in radians
     radians = math.atan2(-sine, cosine)
    
@@ -242,7 +233,7 @@ def convert_to_degrees(cosine, sine):
     return 360 - degrees
 
 def remove_keys_recursive(d, keys_to_remove):
-    """
+    '''
     Recursively removes specified keys from a dictionary.
     
     Args:
@@ -251,7 +242,7 @@ def remove_keys_recursive(d, keys_to_remove):
     
     Returns:
     - A new dictionary with specified keys removed.
-    """
+    '''
     if not isinstance(d, dict):
         return d
 
@@ -266,7 +257,6 @@ def remove_keys_recursive(d, keys_to_remove):
                 new_dict[key] = value
 
     return new_dict
-
 
 def readJsonFile(file_path):
     try:
