@@ -125,22 +125,31 @@ class SearchablePDF():
         pdf_bboxes, degrees = extraction_wrapper(relevant_json)
 
         (pdf_height, pdf_width) = self.pdf.dimensions
-        (im_width, im_height) = self.pdf.image.size
+        (im_width, im_height) = self.pdf.full_size_image.size
 
         img_bboxes = [pdf_coords_to_img_coords(pdf_bbox, pdf_height, pdf_width, im_width, im_height) for pdf_bbox in pdf_bboxes]
 
+        adjusted_bboxes = []
+        # adjust bbox based on padding
+        for bbox in img_bboxes:
+            #  (x0, y0, x1, y1)
+            adjust_bbox = [bbox[0]-self.pdf.left_padding, bbox[1]-self.pdf.top_padding, bbox[2]-self.pdf.left_padding, bbox[3]-self.pdf.top_padding]
+            adjusted_bboxes.append(adjust_bbox)
+            print('Adjust bboxes from to', bbox, adjust_bbox, )
+        
+        #img_bboxes = adjusted_bboxes
         if self.verbose:
             print('pdf bboxes: ', pdf_bboxes)
             print('image bboxes: ', img_bboxes)
 
-        x = str(img_bboxes[0][2] - img_bboxes[0][0])
-        y = str(img_bboxes[0][3] - img_bboxes[0][1])
+        x = str(adjusted_bboxes[0][2] - adjusted_bboxes[0][0])
+        y = str(adjusted_bboxes[0][3] - adjusted_bboxes[0][1])
 
         return {
             'status': 'success',
             'message_history': self.messages,
             'focus_point': (x, y), # in img coordinates
-            'bboxes': img_bboxes, # in img coordinates
+            'bboxes': adjusted_bboxes, # in img coordinates
             'degrees': degrees,
             'relevant_json': remove_keys_recursive(relevant_json, ['dir', 'bbox'])
         }

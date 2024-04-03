@@ -10,12 +10,21 @@ class SinglePagePDF:
         self.page = doc[rel_page]
         self.page_dict = self._get_page_dict()
         self.path = pdf_path
-        self.image = self.toImage(do_crop)
+        self.full_size_image = self.toImage()
+        self.left_padding, self.right_padding, self.top_padding, self.bottom_padding = self._get_padding(pad_whitespace=do_crop)
 
-    def _crop_whitespace(self, image: Image) -> Image:
+        self.image = self._crop_padding(self.full_size_image)
 
+    def _get_padding(self, pad_whitespace=False):
+
+        image = self.full_size_image#self.toImage()
         # Convert PIL Image to numpy array for easier manipulation
         image_array = np.array(image)
+
+        height, width, _ = image_array.shape
+
+        if not pad_whitespace:
+            return  [0, 0, 0, 0]
 
         # Convert the image to grayscale if it's not already
         if len(image_array.shape) == 3:  # Check if it's a color image
@@ -28,8 +37,14 @@ class SinglePagePDF:
         top, bottom = np.min(non_white_indices[0]), np.max(non_white_indices[0])
         left, right = np.min(non_white_indices[1]), np.max(non_white_indices[1])
 
-        # Crop the image using the bounding box
-        cropped_image = image.crop((left, top, right, bottom))
+        return [left, width-right, top, height-bottom]
+
+    def _crop_padding(self, image: Image) -> Image:
+        
+        width, height = image.size
+        # Crop the image using the bounding box left, upper, right, and lower 
+        cropped_image = image.crop((self.left_padding, self.top_padding, width - self.right_padding, height - self.bottom_padding))
+        #cropped_image = image.crop((left, top, right, bottom))
 
         return cropped_image
 
@@ -43,20 +58,17 @@ class SinglePagePDF:
     def getRawText():
         pass
 
-    def toImage(self, do_crop: bool = False) -> Image:
+    def toImage(self) -> Image:
         ''' Coverts self.page to PIL image
         '''
 
         rect = self.page.search_for(" ")
 
-        if not rect or not do_crop:
-            rect = self.page.rect
+        #if not rect or not do_crop:
+        #    rect = self.page.rect
 
         pix = self.page.get_pixmap(matrix=fitz.Matrix(2, 2), clip=rect)
         pil_image = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-
-        if do_crop:
-            pil_image = self._crop_whitespace(pil_image)
         
         return pil_image
 
