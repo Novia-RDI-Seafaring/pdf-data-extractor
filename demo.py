@@ -4,7 +4,8 @@
 import gradio as gr
 import json
 import numpy as np
-import os
+from PIL import Image
+
 
 from pdf_data_extractor import SearchablePDF
 from pdf_data_extractor.src.utils import *
@@ -12,6 +13,7 @@ from pdf_data_extractor.src.utils import *
 config = {
     'json_value_path': 'demo_data/he-specification.json',
     'json_schema_path': 'demo_data/he-specification_schema.json',
+    'crop_im': False
 }
 
 #TODO move to extended query engine
@@ -44,7 +46,7 @@ def upload_file(pdf_path, progress=gr.Progress()):
         json_schema_string = json.dumps(json.loads(json_schema_contents))
 
 
-        searchablePDF = SearchablePDF(pdf=pdf_path, json_schema_string=json_schema_string, json_value_string=json_value_string)
+        searchablePDF = SearchablePDF(pdf=pdf_path, json_schema_string=json_schema_string, json_value_string=json_value_string, do_crop=config['crop_im'])
 
         progress(0.5, desc="Making Document Searchable ...")
 
@@ -52,7 +54,7 @@ def upload_file(pdf_path, progress=gr.Progress()):
         rel_json =  remove_keys_recursive(searchablePDF.json_query_engine._json_value, ['dir', 'bbox'])
 
         print(pdf_path, pdf_path.name)
-        return [pdf_path, f"```json{json.dumps(rel_json, indent=4)}```", json_schema_string, searchablePDF, gr.update(visible=False), gr.update(visible=True)]
+        return [pdf_path, f"```json{json.dumps(rel_json, indent=4)}```", json_schema_string, searchablePDF, gr.update(visible=False), gr.update(visible=True), gr.update(value=searchablePDF.pdf.image)]
     except():
         print("done")
 
@@ -187,7 +189,7 @@ with gr.Blocks(css=css, head=head) as demo:
     with gr.Row():
         with gr.Column(elem_id="imageColumn"):
             with gr.Row(visible=False, elem_classes='image_holder') as original_image_row:
-                imm = gr.Image('demo_data/he-specification.jpg', show_label=False, container=False, elem_classes="originalImage")
+                imm = gr.Image(Image.new('RGB', (1, 1)), show_label=False, container=False, elem_classes="originalImage")
             with gr.Row(visible=False, elem_classes='image_holder') as annotated_image_row:
                 anIm = gr.AnnotatedImage(show_legend=False, show_label=False, container=False)
             with gr.Row():
@@ -201,7 +203,7 @@ with gr.Blocks(css=css, head=head) as demo:
             reset_button.click(get_entire_json, searchablePDF, json_string_relevant)
             file_output = gr.File(visible=False, label="Upload the schema PDF")
             upload_button = gr.UploadButton("Click to Upload a File", file_types=["file"], file_count="single")
-            upload_button.upload(upload_file, upload_button, [file_output, json_string_relevant, json_schema, searchablePDF, reset_button, original_image_row])
+            upload_button.upload(upload_file, upload_button, [file_output, json_string_relevant, json_schema, searchablePDF, reset_button, original_image_row, imm])
 
         with gr.Column():
             with gr.Row():
