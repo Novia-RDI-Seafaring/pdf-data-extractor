@@ -5,10 +5,13 @@ import gradio as gr
 import json
 import numpy as np
 from PIL import Image
+from dotenv import load_dotenv, find_dotenv
 
 
 from pdf_data_extractor import SearchablePDF
 from pdf_data_extractor.src.utils import *
+
+load_dotenv(find_dotenv())
 
 config = {
     'json_value_path': 'demo_data/he-specification.json',
