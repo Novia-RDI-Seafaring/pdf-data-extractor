@@ -1,21 +1,20 @@
-from .single_page_pdf import SinglePagePDF
-from .prompts import EXTRACT_JSON_VALUE_FROM_SCHEMA
-
-from llama_index import ServiceContext
-from llama_index.llms import OpenAI
-from llama_index.multi_modal_llms.openai import OpenAIMultiModal
-from llama_index.indices.struct_store import JSONQueryEngine
-from llama_index.core.llms.types import ChatMessage
-from llama_index.schema import ImageDocument
 import json
 import os
+
+from llama_index import ServiceContext
+from llama_index.indices.struct_store import JSONQueryEngine
+from llama_index.llms import OpenAI
+from llama_index.multi_modal_llms.openai import OpenAIMultiModal
+from llama_index.schema import ImageDocument
+
+from .single_page_pdf import SinglePagePDF
+from .prompts import EXTRACT_JSON_VALUE_FROM_SCHEMA
 from .utils import *
 
 api_key = os.getenv('OPENAI_API_KEY')
 
 class SearchablePDF():
-
-    def __init__(self, 
+    def __init__(self,
                  pdf: SinglePagePDF | str,
                  json_schema_string: str,
                  json_value_string = None,
@@ -39,7 +38,7 @@ class SearchablePDF():
             self.json_value_string = self._getText()
         else:
             self.json_value_string = json_value_string
-        
+
         self.json_query_engine = JSONQueryEngine(
             json_value=json.loads(self.json_value_string),
             json_schema=json.loads(json_schema_string),
@@ -50,7 +49,7 @@ class SearchablePDF():
 
         # chat history
         self.messages = []
-    
+
     def add_message(self, user_query, bot_response):
         if self.verbose:
             print("Adding user query to messages:", user_query)  # Debug print
@@ -71,7 +70,7 @@ class SearchablePDF():
             image_documents=[ImageDocument(image=f"{pil_to_base64(self.pdf.image)}")]
         )
 
-        try:  
+        try:
             json_markdown = response.text.replace('\\n','\n')
             json_string = extract_json_from_markdown(json_markdown)
         except Exception as e:
@@ -87,7 +86,7 @@ class SearchablePDF():
         try:
             response = self.json_query_engine.query(query)
             relevant_json = custom_output_processor(response.metadata['json_path_response_str'], self.json_query_engine._json_value)
-            
+
             self.add_message(query, response.response)
 
             if self.verbose:
@@ -111,7 +110,7 @@ class SearchablePDF():
                 # Handle other types of ValueError or re-raise if it's an unexpected error
                 response = "An error occurred: " + str(e)
                 # self.add_message(query, response)
-                
+
                 status = 'failed'
 
             return {
@@ -122,14 +121,14 @@ class SearchablePDF():
                     'degrees': 0,
                     'relevant_json': {}
                 }
-        
+
         pdf_bboxes, degrees = extraction_wrapper(relevant_json)
-        
+
         (pdf_height, pdf_width) = self.pdf.dimensions
         (im_width, im_height) = self.pdf.image.size
 
         img_bboxes = [pdf_coords_to_img_coords(pdf_bbox, pdf_height, pdf_width, im_width, im_height) for pdf_bbox in pdf_bboxes]
-        
+
         if self.verbose:
             print('pdf bboxes: ', pdf_bboxes)
             print('image bboxes: ', img_bboxes)
