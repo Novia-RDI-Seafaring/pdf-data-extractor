@@ -22,11 +22,12 @@ class SearchablePDF():
                  chat_llm=OpenAI('gpt-4', max_tokens=4000, api_key=api_key),
                  multimodal_llm=OpenAIMultiModal('gpt-4-vision-preview', max_new_tokens=4000, timeout=500,
                                                  image_detail='auto', api_key=api_key),
-                 verbose=False):
+                 verbose=False,
+                 do_crop=False):
         
 
         if isinstance(pdf, str):
-            pdf = SinglePagePDF(pdf_path=pdf)
+            pdf = SinglePagePDF(pdf_path=pdf, do_crop=do_crop)
 
         self.pdf = pdf
         self.multimodal_llm = multimodal_llm

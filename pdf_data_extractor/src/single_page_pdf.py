@@ -5,14 +5,14 @@ from PIL import Image
 
 class SinglePagePDF:
 
-    def __init__(self, pdf_path, rel_page=0):
+    def __init__(self, pdf_path, rel_page=0, do_crop=False):
         doc = fitz.open(pdf_path)
         self.page = doc[rel_page]
         self.page_dict = self._get_page_dict()
         self.path = pdf_path
-        self.image = self.toImage()
+        self.image = self.toImage(do_crop)
 
-    def _crop_whitespace(image):
+    def _crop_whitespace(self, image):
 
         # Convert PIL Image to numpy array for easier manipulation
         image_array = np.array(image)
