@@ -17,12 +17,12 @@ class SearchablePDF():
     def __init__(self,
                  pdf: SinglePagePDF | str,
                  json_schema_string: str,
-                 json_value_string = None,
-                 chat_llm=OpenAI('gpt-4', max_tokens=4000, api_key=api_key),
-                 multimodal_llm=OpenAIMultiModal('gpt-4-vision-preview', max_new_tokens=4000, timeout=500,
+                 json_value_string: str = None,
+                 chat_llm: OpenAI = OpenAI('gpt-4', max_tokens=4000, api_key=api_key),
+                 multimodal_llm: OpenAIMultiModal = OpenAIMultiModal('gpt-4-vision-preview', max_new_tokens=4000, timeout=500,
                                                  image_detail='auto', api_key=api_key),
-                 verbose=False,
-                 do_crop=False):
+                 verbose: bool = False,
+                 do_crop: bool = False) -> None:
         
 
         if isinstance(pdf, str):
@@ -50,7 +50,7 @@ class SearchablePDF():
         # chat history
         self.messages = []
 
-    def add_message(self, user_query, bot_response):
+    def add_message(self, user_query: str, bot_response: str) -> None:
         if self.verbose:
             print("Adding user query to messages:", user_query)  # Debug print
         self.messages.append({"message": user_query, "is_user": True})  # User message
@@ -58,7 +58,7 @@ class SearchablePDF():
             print("Adding bot response to messages:", bot_response)  # Debug print
         self.messages.append({"message": bot_response, "is_user": False})  # Bot response
 
-    def _getText(self):
+    def _getText(self) -> str:
         if self.verbose:
             print('generating json value')
         stripped_page_dict = strip_dict(self.pdf.page_dict, ['width', 'height', 'text','bbox', 'dir'])
@@ -80,7 +80,7 @@ class SearchablePDF():
             print('Finished generating json value')
         return json_string
 
-    def query(self, query):
+    def query(self, query: str) -> dict:
         '''
         '''
         try:

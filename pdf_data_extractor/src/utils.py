@@ -54,7 +54,7 @@ def custom_output_processor(llm_output: str, json_value: dict) -> dict:
     
     return results
 
-def extract_bboxes_and_dirs(dictionary):
+def extract_bboxes_and_dirs(dictionary: dict):
     bboxes = []
     dirs = []
     for key, value in dictionary.items():
@@ -69,7 +69,7 @@ def extract_bboxes_and_dirs(dictionary):
    
     return bboxes, dirs
  
-def extraction_wrapper(dictionary):
+def extraction_wrapper(dictionary: dict):
     '''Returns:
     - list[[x0,y0,x1,z1]] bboxes
     - degree (int) between 0-360'''
@@ -79,7 +79,7 @@ def extraction_wrapper(dictionary):
     im_dir = 0 if len(dirs)==0 else dirs[0]
     return bboxes, im_dir
 
-def pdf_coords_to_img_coords(pdf_coords, pdf_height, pdf_width, im_width, im_height):
+def pdf_coords_to_img_coords(pdf_coords: tuple[float, float, float, float], pdf_height: float, pdf_width: float, im_width: int, im_height: int) -> tuple[int, int, int, int]:
     '''PDF bbox coords as (x0, y0, x1, y1)
     to img coords in pixel coords (x0,y0, x1,y1)'''
 
@@ -102,7 +102,7 @@ def extract_json_from_markdown(json_markdown):
     
     return json_string.group(1).strip()
 
-def draw_rects(page, bboxes, color=(1, 0, 0)):
+def draw_rects(page: fitz.Page, bboxes: list[tuple[float, float, float, float]], color: tuple[float, float, float] = (1, 0, 0)):
     '''adds rect to page in place
     '''
 
@@ -122,14 +122,14 @@ def draw_rects(page, bboxes, color=(1, 0, 0)):
 
     shape.commit()
 
-def get_page_dict(page):
+def get_page_dict(page: fitz.Page):
     # https://pymupdf.readthedocs.io/en/latest/textpage.html#textpagedict
     textpage = page.get_textpage()
     page_dict = textpage.extractDICT()
     return page_dict
     #page.get_text('dict')
 
-def get_text_orientation(page, rect_a):
+def get_text_orientation(page: fitz.Page, rect_a):
     '''finds line in page with highest roi with given rect_a
     returns direction in (cosine, -sine)
     https://pymupdf.readthedocs.io/en/latest/textpage.html#textpagedict
@@ -190,7 +190,7 @@ def strip_dict(input_dict, keysToKeep):
     
     return stripped_dict
 
-def pdf_to_pil_array(pdf_path):
+def pdf_to_pil_array(pdf_path: str):
     pdf_document = fitz.open(pdf_path)
     pil_images = []
 
@@ -207,7 +207,7 @@ def pdf_to_pil_array(pdf_path):
     
     return pil_images
 
-def pil_to_base64(pil_image):
+def pil_to_base64(pil_image: Image):
     # Convert PIL Image to bytes
     with io.BytesIO() as buffer:
         pil_image.save(buffer, format="PNG")
@@ -219,7 +219,7 @@ def pil_to_base64(pil_image):
     # Return base64 string in the specified format
     #return f"data:image/png;base64,{base64_image}"
 
-def convert_to_degrees(cosine, sine):
+def convert_to_degrees(cosine: float, sine: float):
     # Calculate the angle in radians
     radians = math.atan2(-sine, cosine)
    
@@ -232,7 +232,7 @@ def convert_to_degrees(cosine, sine):
    
     return 360 - degrees
 
-def remove_keys_recursive(d, keys_to_remove):
+def remove_keys_recursive(d: dict, keys_to_remove: list[str]):
     '''
     Recursively removes specified keys from a dictionary.
     
@@ -258,7 +258,7 @@ def remove_keys_recursive(d, keys_to_remove):
 
     return new_dict
 
-def readJsonFile(file_path):
+def readJsonFile(file_path: str):
     try:
         with open(file_path, 'r') as file:
             data = json.load(file)
