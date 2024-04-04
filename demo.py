@@ -16,7 +16,7 @@ load_dotenv(find_dotenv())
 config = {
     'json_value_path': 'demo_data/he-specification.json',
     'json_schema_path': 'demo_data/he-specification_schema.json',
-    'crop_im': False
+    'crop_im': True
 }
 
 #TODO move to extended query engine
@@ -82,7 +82,9 @@ css = """
 .feedback textarea {
     font-size: 24px !important
 }
-
+#imageColumn {
+    overflow: hidden;
+}
 #imageColumn .image_holder {
     transition: transform 1s ease, transform-origin 1s ease;
     transform-origin: center;
