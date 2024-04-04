@@ -16,6 +16,8 @@ class SinglePagePDF:
         self.image = self._crop_padding(self.full_size_image)
 
     def _get_padding(self, pad_whitespace=False):
+        ''' Get padding to all sides in pixels
+        '''
 
         image = self.full_size_image#self.toImage()
         # Convert PIL Image to numpy array for easier manipulation
@@ -37,7 +39,7 @@ class SinglePagePDF:
         top, bottom = np.min(non_white_indices[0]), np.max(non_white_indices[0])
         left, right = np.min(non_white_indices[1]), np.max(non_white_indices[1])
 
-        return [left, width-right, top, height-bottom]
+        return [left.item(), (width-right).item(), top.item(), (height-bottom).item()]
 
     def _crop_padding(self, image: Image) -> Image:
         
