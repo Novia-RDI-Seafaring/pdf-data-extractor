@@ -21,6 +21,7 @@ class SearchablePDF():
                  chat_llm: OpenAI = OpenAI('gpt-4', max_tokens=4000, api_key=api_key),
                  multimodal_llm: OpenAIMultiModal = OpenAIMultiModal('gpt-4-vision-preview', max_new_tokens=4000, timeout=500,
                                                  image_detail='auto', api_key=api_key),
+                 synthesize_error=False,
                  verbose: bool = False,
                  do_crop: bool = False) -> None:
         
@@ -32,6 +33,7 @@ class SearchablePDF():
         self.multimodal_llm = multimodal_llm
         self.chat_llm = chat_llm
         self.json_schema_string = json_schema_string
+        self.synthesize_error = synthesize_error,
         self.verbose = verbose
 
         if json_value_string is None:
@@ -98,23 +100,28 @@ class SearchablePDF():
 
         # TODO handle exceptions
         except ValueError as e:
-            # Handle cases where the query does not match the schema
-            if "Invalid JSON Path" in str(e):
-                print('------------ Exception that was thrown: ', e)
-                prompt = f"""The user asked: '{query}', which was not found by the JsonQueryEngine. Use the following error to provide
-                a helpful response: {e}. {hidden_prompt}"""
-                response = self.chat_llm.complete(prompt)
+            if self.synthesize_error:
+                # Handle cases where the query does not match the schema
+                if "Invalid JSON Path" in str(e):
+                    print('------------ Exception that was thrown: ', e)
+                    prompt = f"""The user asked: '{query}', which was not found by the JsonQueryEngine. Use the following error to provide
+                    a helpful response: {e}. {hidden_prompt}"""
+                    response = self.chat_llm.complete(prompt)
 
-                self.add_message(query, response.text)
+                    self.add_message(query, response.text)
 
-                status = 'success'
+                    status = 'success'
+                else:
+                    pass
+                    # Handle other types of ValueError or re-raise if it's an unexpected error
+                    response = "An error occurred: " + str(e)
+                    # self.add_message(query, response)
+
+                    status = 'failed'
             else:
-                pass
-                # Handle other types of ValueError or re-raise if it's an unexpected error
-                response = "An error occurred: " + str(e)
-                # self.add_message(query, response)
-
-                status = 'failed'
+                print('default error response')
+                status = 'success'
+                self.add_message(query, "I don't understand what you are looking for")
 
             return {
                     'status': status,
