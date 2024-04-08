@@ -145,14 +145,17 @@ class SearchablePDF():
             print('pdf bboxes: ', pdf_bboxes)
             print('image bboxes: ', img_bboxes)
 
-        #focus point as center of first bounding box in pixels
-        x = adjusted_bboxes[0][0] + (adjusted_bboxes[0][2]-adjusted_bboxes[0][0])/2
-        y = adjusted_bboxes[0][1] + (adjusted_bboxes[0][3]-adjusted_bboxes[0][1])/2
+        focus_point = None
+        if len(adjusted_bboxes)>0:
+            #focus point as center of first bounding box in pixels
+            x = adjusted_bboxes[0][0] + (adjusted_bboxes[0][2]-adjusted_bboxes[0][0])/2
+            y = adjusted_bboxes[0][1] + (adjusted_bboxes[0][3]-adjusted_bboxes[0][1])/2
+            focus_point = (x, y)
 
         return {
             'status': 'success',
             'message_history': self.messages,
-            'focus_point': (x, y), # in img coordinates
+            'focus_point': focus_point, # in img coordinates
             'bboxes': adjusted_bboxes, # in img coordinates
             'degrees': degrees,
             'relevant_json': remove_keys_recursive(relevant_json, ['dir', 'bbox'])
