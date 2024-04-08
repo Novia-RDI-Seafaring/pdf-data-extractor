@@ -83,8 +83,10 @@ class SearchablePDF():
     def query(self, query: str) -> dict:
         '''
         '''
+        hidden_prompt = 'Answer as a human, either in a text paragraph or bullet points.'
+        extended_query = f'{query} {hidden_prompt}'
         try:
-            response = self.json_query_engine.query(query)
+            response = self.json_query_engine.query(extended_query)
             relevant_json = custom_output_processor(response.metadata['json_path_response_str'], self.json_query_engine._json_value)
 
             self.add_message(query, response.response)
