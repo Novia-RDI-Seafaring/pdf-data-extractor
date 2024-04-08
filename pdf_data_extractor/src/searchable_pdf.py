@@ -101,7 +101,7 @@ class SearchablePDF():
             if "Invalid JSON Path" in str(e):
                 print('------------ Exception that was thrown: ', e)
                 prompt = f"""The user asked: '{query}', which was not found by the JsonQueryEngine. Use the following error to provide
-                a helpful response: {e}."""
+                a helpful response: {e}. {hidden_prompt}"""
                 response = self.chat_llm.complete(prompt)
 
                 self.add_message(query, response.text)
