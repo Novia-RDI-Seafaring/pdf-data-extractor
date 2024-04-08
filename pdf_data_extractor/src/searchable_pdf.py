@@ -8,7 +8,7 @@ from llama_index.multi_modal_llms.openai import OpenAIMultiModal
 from llama_index.schema import ImageDocument
 
 from .single_page_pdf import SinglePagePDF
-from .prompts import EXTRACT_JSON_VALUE_FROM_SCHEMA
+from .prompts import EXTRACT_JSON_VALUE_FROM_SCHEMA, CUSTOM_JSON_PATH_PROMPT
 from .utils import *
 
 api_key = os.getenv('OPENAI_API_KEY')
@@ -44,6 +44,7 @@ class SearchablePDF():
             json_schema=json.loads(json_schema_string),
             service_context=ServiceContext.from_defaults(llm=self.chat_llm),
             output_processor=custom_output_processor,
+            json_path_prompt=CUSTOM_JSON_PATH_PROMPT,
             verbose=self.verbose
         )
 
