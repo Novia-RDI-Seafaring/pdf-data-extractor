@@ -33,7 +33,7 @@ class SearchablePDF():
         self.multimodal_llm = multimodal_llm
         self.chat_llm = chat_llm
         self.json_schema_string = json_schema_string
-        self.synthesize_error = synthesize_error,
+        self.synthesize_error = synthesize_error
         self.verbose = verbose
 
         if json_value_string is None:
