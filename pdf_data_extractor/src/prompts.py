@@ -29,6 +29,7 @@ CUSTOM_JSON_PATH_TMPL = (
     "{schema}\n"
     "Given a task, respond with JSON Path queries that "
     "can retrieve data from a JSON value that matches the schema. "
+    "Some queries might be solely conversational and have no matches in the schema, for these situations return ''. "
     "Seperate JSON Path queries with comma.\n"
     "Task: {query_str}\n"
     "JSONPath: "
