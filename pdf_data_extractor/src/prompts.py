@@ -38,3 +38,19 @@ CUSTOM_JSON_PATH_TMPL = (
 CUSTOM_JSON_PATH_PROMPT = PromptTemplate(
     CUSTOM_JSON_PATH_TMPL, prompt_type=PromptType.JSON_PATH
 )
+
+CUSTOM_RESPONSE_SYNTHESIS_PROMPT_TMPL = (
+    "Given a query, synthesize a response "
+    "to satisfy the query using the JSON results. "
+    "Only include details that are relevant to the query. "
+    "If you don't know the answer, then say 'I'm sorry, I don't understand what you are looking for.'.\n"
+    "JSON Schema: {json_schema}\n"
+    "JSON Path: {json_path}\n"
+    "Value at path: {json_path_value}\n"
+    "Query: {query_str}\n"
+    "Response: "
+)
+CUSTOM_RESPONSE_SYNTHESIS_PROMPT = PromptTemplate(
+    CUSTOM_RESPONSE_SYNTHESIS_PROMPT_TMPL,
+    prompt_type=PromptType.SQL_RESPONSE_SYNTHESIS,
+)
