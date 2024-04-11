@@ -5,6 +5,7 @@ import gradio as gr
 import json
 import numpy as np
 from PIL import Image
+from llama_index.llms import OpenAI
 from dotenv import load_dotenv, find_dotenv
 
 
@@ -48,8 +49,13 @@ def upload_file(pdf_path, progress=gr.Progress()):
             json_schema_contents = json_schema_file.read()
         json_schema_string = json.dumps(json.loads(json_schema_contents))
 
-
-        searchablePDF = SearchablePDF(pdf=pdf_path, json_schema_string=json_schema_string, json_value_string=json_value_string, do_crop=config['crop_im'])
+        chat_llm = OpenAI('gpt-3.5-turbo-0125', max_tokens=4000)
+        searchablePDF = SearchablePDF(pdf=pdf_path, 
+                                      json_schema_string=json_schema_string, 
+                                      json_value_string=json_value_string, 
+                                      chat_llm=chat_llm,
+                                      verbose=True,
+                                      do_crop=config['crop_im'])
 
         progress(0.5, desc="Making Document Searchable ...")
 
