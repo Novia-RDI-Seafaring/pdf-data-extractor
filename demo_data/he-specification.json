@@ -229,11 +229,12 @@
       }
     }
   },
-  "auxData": [
-    {
+  "drawingInformation": {
+    "dimensions": {
       "text": "ALL DIMENSIONS ARE IN MILLIMETERS",
       "bbox": [185.2705535888672, 396.4610290527344, 358.5860595703125, 407.50103759765625],
       "dir": [1.0, 0.0]
     }
-  ]
+  },
+  "auxData": []
 }

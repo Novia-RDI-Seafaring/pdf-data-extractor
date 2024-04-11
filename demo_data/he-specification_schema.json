@@ -616,6 +616,24 @@
                 "side2"
             ]
         },
+        "drawingInformation":{
+            "dimensions": {
+                "description": "Dimensions of the embedding drawing/image",
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string"
+                    },
+                    "bbox": { "$ref": "#/definitions/bbox" },
+                    "dir": { "$ref": "#/definitions/2dArr" } 
+                },
+                "required": [
+                    "text",
+                    "bbox",
+                    "dir"
+                ]
+            }
+        },
         "auxData": {
             "description": "Contains information that is in the document but does not fit to any of the other specified fields in the schema",
             "type": "array",
