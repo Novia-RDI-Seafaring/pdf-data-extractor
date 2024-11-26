@@ -5,25 +5,32 @@ from llama_index import ServiceContext
 from llama_index.indices.struct_store import JSONQueryEngine
 from llama_index.llms import OpenAI
 from llama_index.multi_modal_llms.openai import OpenAIMultiModal
+from llama_index.llms.azure_openai import AzureOpenAI
+from llama_index.multi_modal_llms.azure_openai import AzureOpenAIMultiModal
 from llama_index.schema import ImageDocument
 
 from .single_page_pdf import SinglePagePDF
 from .prompts import EXTRACT_JSON_VALUE_FROM_SCHEMA, CUSTOM_JSON_PATH_PROMPT, CUSTOM_RESPONSE_SYNTHESIS_PROMPT
 from .utils import *
 
-api_key = os.getenv('OPENAI_API_KEY')
+# api_key = os.getenv('OPENAI_API_KEY')
+azure_api_key = os.getenv('AZURE_OPENAI_API_KEY')
+azure_api_base = os.getenv('AZURE_OPENAI_API_BASE')
+azure_api_version = os.getenv('AZURE_OPENAI_API_VERSION')
+azure_api_deployment_name = os.getenv('AZURE_OPENAI_API_DEPLOYMENT_NAME')
 
 class SearchablePDF():
     def __init__(self,
-                 pdf: SinglePagePDF | str,
-                 json_schema_string: str,
-                 json_value_string: str = None,
-                 chat_llm: OpenAI = OpenAI('gpt-4', max_tokens=4000, api_key=api_key),
-                 multimodal_llm: OpenAIMultiModal = OpenAIMultiModal('gpt-4-vision-preview', max_new_tokens=4000, timeout=500,
-                                                 image_detail='auto', api_key=api_key),
-                 synthesize_error=False,
-                 verbose: bool = False,
-                 do_crop: bool = False) -> None:
+                pdf: SinglePagePDF | str,
+                json_schema_string: str,
+                json_value_string: str = None,
+                # chat_llm: OpenAI = OpenAI('gpt-4o', max_tokens=4000, api_key=api_key),
+                # multimodal_llm: OpenAIMultiModal = OpenAIMultiModal('gpt-4o', max_new_tokens=4000, timeout=500, image_detail='auto', api_key=azure_api_key),
+                chat_llm: AzureOpenAI = AzureOpenAI(api_key=azure_api_key, api_base=azure_api_base, api_version=azure_api_version, deployment_name=azure_api_deployment_name, temperature=0),
+                multimodal_llm: AzureOpenAIMultiModal = AzureOpenAIMultiModal(api_key=azure_api_key, api_base=azure_api_base, api_version=azure_api_version, deployment_name=azure_api_deployment_name, max_new_tokens=4000, timeout=500, image_detail='auto', temperature=0),
+                synthesize_error=False,
+                verbose: bool = False,
+                do_crop: bool = False) -> None:
         
 
         if isinstance(pdf, str):
