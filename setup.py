@@ -6,7 +6,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'jsonpath-ng',
-        'llama-index==0.9.48',
+        'llama-index==0.12.2',
         'pillow',
         'PyMuPDF'
     ],
