@@ -5,14 +5,20 @@ import gradio as gr
 import json
 import numpy as np
 from PIL import Image
-from llama_index.llms import OpenAI
+# from llama_index.llms import OpenAI
+from llama_index.llms.azure_openai import AzureOpenAI
 from dotenv import load_dotenv, find_dotenv
-
+import os
 
 from pdf_data_extractor import SearchablePDF
 from pdf_data_extractor.src.utils import *
 
 load_dotenv(find_dotenv())
+
+aoai_api_key = os.getenv('aoai_api_key')
+aoai_endpoint = os.getenv('aoai_endpoint')
+aoai_api_version = os.getenv('aoai_api_version')
+aoai_deployment_name = os.getenv('aoai_deployment_name')
 
 config = {
     'json_value_path': 'demo_data/he-specification.json',
@@ -49,7 +55,7 @@ def upload_file(pdf_path, progress=gr.Progress()):
             json_schema_contents = json_schema_file.read()
         json_schema_string = json.dumps(json.loads(json_schema_contents))
 
-        chat_llm = OpenAI('gpt-3.5-turbo-0125', max_tokens=4000)
+        chat_llm = AzureOpenAI(api_key=aoai_api_key, endpoint=aoai_endpoint, api_version=aoai_api_version, deployment_name=aoai_deployment_name, max_tokens=4000)
         searchablePDF = SearchablePDF(pdf=pdf_path, 
                                       json_schema_string=json_schema_string, 
                                       json_value_string=json_value_string, 

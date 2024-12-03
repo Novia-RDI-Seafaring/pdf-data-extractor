@@ -1,5 +1,5 @@
-from llama_index.prompts import PromptTemplate
-from llama_index.prompts.prompt_type import PromptType
+from llama_index.core.prompts import PromptTemplate
+from llama_index.core.prompts.prompt_type import PromptType
 
 EXTRACT_JSON_VALUE_FROM_SCHEMA_TEMPLATE = (
     """You are a mechanical enginner, specialized on creating, reading and understanding
@@ -26,11 +26,12 @@ EXTRACT_JSON_VALUE_FROM_SCHEMA = PromptTemplate(
 
 CUSTOM_JSON_PATH_TMPL = (
     "We have provided a JSON schema below:\n"
-    "{schema}\n"
-    "Given a task, respond with JSON Path queries that "
+    "Schema: {schema}\n"
+    "Given a task, respond with ONLY the JSON Path queries that "
     "can retrieve data from a JSON value that matches the schema. "
+    "Do not include any explanatory text or markdown formatting. "
     "Some queries might be solely conversational and have no matches in the schema, for these situations return ''. "
-    "Seperate JSON Path queries with comma.\n"
+    "Separate multiple JSON Path queries with comma.\n"
     "Task: {query_str}\n"
     "JSONPath: "
 )

@@ -1,38 +1,83 @@
 import json
 import os
 
-from llama_index import ServiceContext
-from llama_index.indices.struct_store import JSONQueryEngine
-from llama_index.llms import OpenAI
-from llama_index.multi_modal_llms.openai import OpenAIMultiModal
+from llama_index.core import ServiceContext
+from llama_index.core.indices.struct_store import JSONQueryEngine
+# from llama_index.llms import OpenAI
+# from llama_index.multi_modal_llms.openai import OpenAIMultiModal
 from llama_index.llms.azure_openai import AzureOpenAI
 from llama_index.multi_modal_llms.azure_openai import AzureOpenAIMultiModal
-from llama_index.schema import ImageDocument
+from llama_index.embeddings.azure_openai import AzureOpenAIEmbedding
+from llama_index.core.schema import ImageDocument
+from llama_index.core import Settings
 
 from .single_page_pdf import SinglePagePDF
 from .prompts import EXTRACT_JSON_VALUE_FROM_SCHEMA, CUSTOM_JSON_PATH_PROMPT, CUSTOM_RESPONSE_SYNTHESIS_PROMPT
 from .utils import *
 
-api_key = os.getenv('OPENAI_API_KEY')
+
+aoai_api_key = os.getenv('aoai_api_key')
+aoai_endpoint = os.getenv('aoai_endpoint')
+aoai_api_version = os.getenv('aoai_api_version')
+aoai_deployment_name = os.getenv('aoai_deployment_name')
+
+os.environ['AZURE_OPENAI_API_KEY'] = aoai_api_key
+os.environ['AZURE_OPENAI_ENDPOINT'] = aoai_endpoint
+os.environ['AZURE_OPENAI_API_VERSION'] = aoai_api_version
+os.environ['AZURE_OPENAI_DEPLOYMENT_NAME'] = aoai_deployment_name
 
 class SearchablePDF():
     def __init__(self,
                 pdf: SinglePagePDF | str,
                 json_schema_string: str,
                 json_value_string: str = None,
-                chat_llm: OpenAI = OpenAI('gpt-4o', max_tokens=4000, api_key=api_key),
-                multimodal_llm: OpenAIMultiModal = OpenAIMultiModal('gpt-4o', max_new_tokens=4000, timeout=500, image_detail='auto', api_key=api_key),
+                chat_llm = None,
+                multimodal_llm = None,
+                embed_model = None,
                 synthesize_error=False,
                 verbose: bool = False,
                 do_crop: bool = False) -> None:
-        
 
+        # First assign the parameters to instance variables
+        self.chat_llm = chat_llm or AzureOpenAI(
+            model="gpt-4o",
+            engine="gpt-4o",  # This should match your deployment name
+            temperature=0.0,
+            api_key=aoai_api_key,
+            api_version=aoai_api_version,
+            azure_endpoint=aoai_endpoint,
+            max_tokens=4000,
+            azure_deployment=aoai_deployment_name,  # Add this if needed
+            azure_ad_token=None,  # Add this if using Azure AD authentication
+        )
+        self.multimodal_llm = multimodal_llm or AzureOpenAIMultiModal(
+            model="gpt-4o",
+            engine="gpt-4o",
+            temperature=0.0,
+            api_key=aoai_api_key,
+            api_version=aoai_api_version,
+            azure_endpoint=aoai_endpoint,
+            max_tokens=4000
+        )
+        self.embed_model = embed_model or AzureOpenAIEmbedding(
+            model="text-embedding-ada-002",
+            deployment_name="text-embedding-ada-002",
+            api_key=aoai_api_key,
+            azure_endpoint=aoai_endpoint,
+            api_version=aoai_api_version
+        )
+        
+        # Then use them to configure Settings
+        Settings.llm = self.chat_llm
+        Settings.embed_model = self.embed_model
+        
         if isinstance(pdf, str):
             pdf = SinglePagePDF(pdf_path=pdf, do_crop=do_crop)
 
         self.pdf = pdf
         self.multimodal_llm = multimodal_llm
         self.chat_llm = chat_llm
+        self.embed_model = embed_model
         self.json_schema_string = json_schema_string
         self.synthesize_error = synthesize_error
         self.verbose = verbose
@@ -42,10 +87,19 @@ class SearchablePDF():
         else:
             self.json_value_string = json_value_string
 
+        # TODO: add embed_model to service context
+        
+        # Add debug prints
+        print("JSON Schema:")
+        # print(json.dumps(json.loads(json_schema_string), indent=2))
+        print("\nJSON Value:")
+        # print(json.dumps(json.loads(self.json_value_string), indent=2))
+    
         self.json_query_engine = JSONQueryEngine(
             json_value=json.loads(self.json_value_string),
             json_schema=json.loads(json_schema_string),
-            service_context=ServiceContext.from_defaults(llm=self.chat_llm),
+            llm=self.chat_llm,
+            embed_model=self.embed_model,
             output_processor=custom_output_processor,
             json_path_prompt=CUSTOM_JSON_PATH_PROMPT,
             response_synthesis_prompt=CUSTOM_RESPONSE_SYNTHESIS_PROMPT,
@@ -54,6 +108,10 @@ class SearchablePDF():
 
         # chat history
         self.messages = []
+
+        print("Azure endpoint:", aoai_endpoint)
+        print("API version:", aoai_api_version)
+        print("LLM type:", type(self.chat_llm))
 
     def add_message(self, user_query: str, bot_response: str) -> None:
         if self.verbose:
@@ -86,53 +144,53 @@ class SearchablePDF():
         return json_string
 
     def query(self, query: str) -> dict:
-        '''
-        '''
-        hidden_prompt = 'Answer as a human, either in a text paragraph or bullet points.'
-        extended_query = f'{query} {hidden_prompt}'
         try:
-            response = self.json_query_engine.query(extended_query)
-            relevant_json = custom_output_processor(response.metadata['json_path_response_str'], self.json_query_engine._json_value)
-
-            self.add_message(query, response.response)
-
+            hidden_prompt = 'Answer as a human, either in a text paragraph or bullet points.'
+            extended_query = f'{query} {hidden_prompt}'
             if self.verbose:
-                print('Relevant json: -----', relevant_json)
-                print("Current conversation history:", self.messages)
+                print(f"Debug: Processing query: {query}")
+                print(f"Debug: Extended query: {extended_query}")
+            
+            response = self.json_query_engine.query(extended_query)
+            
+            if self.verbose:
+                print(f"Debug: Raw response: {response}")
+                print(f"Debug: Response metadata: {response.metadata}")
+            
+            if not response or not hasattr(response, 'metadata') or 'json_path_response_str' not in response.metadata:
+                raise ValueError("Invalid response structure")
+            
+            # Clean up the JSON path string to remove any explanatory text
+            json_path_str = response.metadata['json_path_response_str'].strip()
+            if json_path_str.startswith('```') and json_path_str.endswith('```'):
+                json_path_str = json_path_str[3:-3].strip()
+            
+            relevant_json = custom_output_processor(json_path_str, self.json_query_engine._json_value)
+            self.add_message(query, response.response)
+            
+            # Continue with the rest of the success path...
 
-        # TODO handle exceptions
         except ValueError as e:
             if self.synthesize_error:
-                # Handle cases where the query does not match the schema
                 if "Invalid JSON Path" in str(e):
-                    print('------------ Exception that was thrown: ', e)
-                    prompt = f"""The user asked: '{query}', which was not found by the JsonQueryEngine. Use the following error to provide
-                    a helpful response: {e}. {hidden_prompt}"""
-                    response = self.chat_llm.complete(prompt)
-
-                    self.add_message(query, response.text)
-
+                    # ... existing error handling ...
                     status = 'success'
                 else:
-                    pass
-                    # Handle other types of ValueError or re-raise if it's an unexpected error
-                    response = "An error occurred: " + str(e)
-                    # self.add_message(query, response)
-
                     status = 'failed'
             else:
-                print('default error response')
-                status = 'success'
-                self.add_message(query, "I don't understand what you are looking for")
+                # Remove this line that's causing the default error response
+                # print('default error response')
+                status = 'failed'  # Change this to failed
+                self.add_message(query, f"Error processing query: {str(e)}")  # More informative error message
 
             return {
-                    'status': status,
-                    'message_history': self.messages,
-                    'focus_point': None, # in img coordinates
-                    'bboxes': [], # in img coordinates
-                    'degrees': 0,
-                    'relevant_json': {}
-                }
+                'status': status,
+                'message_history': self.messages,
+                'focus_point': None,
+                'bboxes': [],
+                'degrees': 0,
+                'relevant_json': {}
+            }
 
         pdf_bboxes, degrees = extraction_wrapper(relevant_json)
 
