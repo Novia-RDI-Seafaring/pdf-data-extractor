@@ -7,6 +7,8 @@ setup(
     install_requires=[
         'jsonpath-ng',
         'llama-index==0.12.2',
+        'llama-index-llms-azure-openai',
+        'llama-index-embeddings-azure-openai',
         'pillow',
         'PyMuPDF'
     ],
